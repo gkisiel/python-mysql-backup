@@ -72,8 +72,8 @@ for db in db_list:
         delcmd = "rm " + pipes.quote(today_bkp_path) + "/" + db["dbName"] + ".sql"
         os.system(delcmd)
 
-        print "Backup script completed"
-        print "Your backups has been created in '" + today_bkp_path + "' directory\n"
+        print("Backup script completed")
+        print("Your backups has been created in '" + today_bkp_path + "' directory\n")
         result_list.append({'db': db["dbName"], 'result': 'Succeeded'})
     except Exception as e:
         sys.stderr.write("Error backing up DB: " + db["dbName"] + "\n")
