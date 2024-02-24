@@ -21,7 +21,7 @@ import time
 import pipes
 import json
 import sys
-from subprocess import Popen, PIPE
+from subprocess import run
 
 # MySQL database details to which backup to be done.
 # Pass the path of the file containing the list of DBs in JSON format
@@ -58,8 +58,10 @@ for db in db_list:
         print("Backing up DB: " + db["dbName"])
 
         # Dump database
-        p = Popen(["mysqldump", "--login-path=" + db["loginPath"], db["dbName"]], stdout=PIPE, stderr=PIPE)
-        out, err = p.communicate()
+        args = ["mysqldump", "--login-path=" + db["loginPath"], db["dbName"]]
+        pout = run(args, capture_output=True, text=True)
+        out = pout.stdout
+        err = pout.stderr
         if len(err) > 0:
             raise Exception(err)
         f = open(pipes.quote(today_bkp_path) + "/" + db["dbName"] + ".sql", "w")
@@ -72,8 +74,8 @@ for db in db_list:
         delcmd = "rm " + pipes.quote(today_bkp_path) + "/" + db["dbName"] + ".sql"
         os.system(delcmd)
 
-        print "Backup script completed"
-        print "Your backups has been created in '" + today_bkp_path + "' directory\n"
+        print("Backup script completed")
+        print("Your backups has been created in '" + today_bkp_path + "' directory\n")
         result_list.append({'db': db["dbName"], 'result': 'Succeeded'})
     except Exception as e:
         sys.stderr.write("Error backing up DB: " + db["dbName"] + "\n")
